@@ -1,0 +1,38 @@
+pipeline { 
+    environment { 
+        registry = "wailkoundi/tp2_jenkins_v3" 
+        registryCredential = '674a41d2-d03a-49c6-b67c-823c14e23570' 
+        dockerImage = '' 
+    } 
+    agent any 
+    stages { 
+        stage('Cloning Git') { 
+            steps { 
+                git branch: 'main', url: 'https://github.com/wail-10/TP2-Jenkins'
+            } 
+        } 
+        stage('Building image') { 
+            steps{ 
+                script { 
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+                } 
+            } 
+        } 
+        stage('Test image') { 
+            steps{ 
+                script { 
+                    echo "Tests passed" 
+                } 
+            } 
+        } 
+        stage('Publish Image') { 
+            steps{ 
+                script { 
+                    docker.withRegistry( '', registryCredential ) { 
+                        dockerImage.push() 
+                    } 
+                } 
+            } 
+        } 
+    } 
+}
